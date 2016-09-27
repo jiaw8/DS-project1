@@ -63,7 +63,7 @@ public class Server {
 	}
 
 	public  void clientDisconnected(String identity) {
-		if(clientList!=null&&clientList.contains(identity)){
+		if(clientList!=null&&clientList.keySet().contains(identity)){
 			clientList.remove(identity);
 		}
 	}
