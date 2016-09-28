@@ -188,6 +188,13 @@ public static String message(String identity,String content){
 
 }
 
+public static String authFail(String identity, String approved){
+	JSONObject message = new JSONObject();
+	message.put("type","authorize");
+	message.put("identity", identity);
+	message.put("approved", approved);
+	return message.toJSONString();
+}
 
 
 }

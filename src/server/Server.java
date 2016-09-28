@@ -40,6 +40,8 @@ public class Server {
     private ConcurrentHashMap<String, String> RemoteChatRoomList = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, String> lockedChatroomID = new ConcurrentHashMap<>();
 
+    private ConcurrentHashMap<String, String> authList = new ConcurrentHashMap<>();
+
     public ThreadPoolExecutor pool;
 
     private static Server server = new Server();
@@ -188,6 +190,10 @@ public class Server {
         return RemoteChatRoomList.keySet();
     }
 
+    public ConcurrentHashMap<String, String> getAuthList() {
+        return authList;
+    }
+
     // main hall
     public void moveToMainHall(String identity) {
         mainHall.addClient(identity, clientList.get(identity));
@@ -256,8 +262,8 @@ public class Server {
         CmdLineArgs cmdLineArgs = new CmdLineArgs();
         CmdLineParser parser = new CmdLineParser(cmdLineArgs);
         parser.parseArgument(args);
-        BufferedReader readerObject;
-        String serverConfig;
+        BufferedReader readerObject,readerObject1;
+        String serverConfig, authInfo;
         System.out.println("1111");
 
         BlockingQueue<Runnable> bqueue = new ArrayBlockingQueue<Runnable>(20);
@@ -267,6 +273,7 @@ public class Server {
             readerObject = new BufferedReader(new FileReader(
                     cmdLineArgs.getServerConfig()));
 
+            // load config file
             while ((serverConfig = readerObject.readLine()) != null) {
                 String[] serverConfigList = serverConfig.split("\t");
 
@@ -287,6 +294,14 @@ public class Server {
                             serverConfigList[0]);
                 }
             }
+
+            readerObject1 = new BufferedReader(new FileReader("userlist"));
+            while ((authInfo = readerObject1.readLine()) != null) {
+                String[] authInfoList = authInfo.split("\t");
+                Server.getInstance().authList.put(authInfoList[0],authInfoList[1]);
+            }
+
+
             Server.getInstance().mainHall = new ChatroomInfo("MainHall-"
                     + Server.getInstance().serverInfo.getServerID(), "");
             Server.getInstance().LocalChatRoomList.put(

@@ -80,6 +80,12 @@ public class ClientConnection implements Runnable {
                 if (msg.isFromClient()) {
 
                     switch (Common.unmarshalling(msg.getMessage(), "type")) {
+                        case "login":
+                            login(msg.getMessage());
+                            break;
+                        case "facebooklogin":
+                            facebooklogin(msg.getMessage());
+                            break;
                         case "newidentity":
                             newIdentity(msg.getMessage());
                             break;
@@ -146,6 +152,28 @@ public class ClientConnection implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void facebooklogin(String msg) {
+        newIdentity(msg);
+    }
+
+    public void login(String msg) {
+        String identity = Common.unmarshalling(msg, "identity");
+        String password = Common.unmarshalling(msg, "password");
+        if (Server.getInstance().getAuthList().get(identity) == null) {
+            Message message = new Message(false, Json.newidentityFalse(identity));
+            messageQueue.add(message);
+            return;
+        } else if (!Server.getInstance().getAuthList().get(identity).equals(password)) {
+            Message message = new Message(false, Json.newidentityFalse(identity));
+            messageQueue.add(message);
+            return;
+        } else {
+            newIdentity(msg);
+            return;
+        }
+
     }
 
     public BlockingQueue<Message> getMessageQueue() {
